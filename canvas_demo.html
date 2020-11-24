@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      #canvas {
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="canvas"></canvas>
+    <script>
+      // 创建画板
+      let canvas = document.getElementById("canvas");
+      let ctx = canvas.getContext("2d");
+
+      // 让画布得大小与屏幕相等
+      canvas.width = document.documentElement.clientWidth;
+      canvas.height = document.documentElement.clientHeight;
+      // canvas 基本设置 用什么颜色填充，线得宽度  线得末尾用圆形包裹
+      ctx.fillStyle = "black";
+      ctx.strokeStyle = "none";
+      ctx.lineWidth = 3;
+      ctx.lineCap = "round";
+      // 定义上一个点
+      let last;
+      // 定义是否在绘画，如果鼠标松开了 就结束这个绘画状态
+      let painting = false;
+      // canvas画线函数
+      function drawLine(x1, y1, x2, y2) {
+        ctx.beginPath();
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(x2, y2);
+        ctx.stroke();
+      }
+
+      // 判断是不是触屏设备
+      const isTouchDevive = "ontouchstart" in document.documentElement;
+
+      // 分手机与电脑进行判断
+      if (isTouchDevive) {
+        canvas.ontouchstart = (e) => {
+          let x = e.touches[0].clientX;
+          let y = e.touches[0].clientY;
+          last = [x, y];
+        };
+        canvas.ontouchmove = (e) => {
+          let x = e.touches[0].clientX;
+          let y = e.touches[0].clientY;
+          drawLine(last[0], last[1], x, y);
+          last = [x, y];
+        };
+      } else {
+        // 如果是电脑  鼠标按下得时候，将坐标给最后一个点
+        canvas.onmousedown = (e) => {
+          painting = true;
+          last = [e.clientX, e.clientY];
+        };
+        // 移动得时候，使用画线函数进行画线，并重新给最后一点赋值
+        canvas.onmousemove = (e) => {
+          if (painting) {
+            drawLine(last[0], last[1], e.clientX, e.clientY);
+            last = [e.clientX, e.clientY];
+          } else {
+          }
+        };
+        // 松开得时候，将画线状态置为false
+        canvas.onmouseup = () => {
+          painting = false;
+        };
+      }
+    </script>
+  </body>
+</html>
